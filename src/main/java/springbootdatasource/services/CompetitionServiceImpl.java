@@ -12,7 +12,7 @@ import springbootdatasource.repositories.CompetitionRepository;
 
 @Data
 @Service
-public class CompetitionServiceImpl {
+public class CompetitionServiceImpl implements CompetitionService {
 
     private final CompetitionRepository competitionRepository;
 
