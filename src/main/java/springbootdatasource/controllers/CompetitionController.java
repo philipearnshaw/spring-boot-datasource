@@ -23,7 +23,6 @@ public class CompetitionController {
     @RequestMapping
     public ResponseEntity<Set<Competition>> getAllCompetitions() {
         return new ResponseEntity<Set<Competition>>(competitionService.findAllCompetitions(), null, HttpStatus.OK);
-
     }
 
     @RequestMapping("/{competitionId}")
