@@ -8,5 +8,5 @@ import springbootdatasource.model.Competition;
 public interface CompetitionService {
 
 	public Set<Competition> findAllCompetitions();
-	public Optional<Competition> getCompetition(final Long competitionId);
+	public Optional<Competition> findCompetition(final Long competitionId);
 }

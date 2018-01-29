@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import springbootdatasource.exception.NotFoundException;
 import springbootdatasource.model.Competition;
 import springbootdatasource.services.CompetitionService;
 
-@Data
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/handball/competitions")
 public class CompetitionController {
@@ -27,8 +28,11 @@ public class CompetitionController {
     }
 
     @GetMapping("/{competitionId}")
-    public ResponseEntity<Competition> getCompetition(@PathVariable("competitionId") final Long competitionId) {
-        final Optional<Competition> competition = competitionService.getCompetition(competitionId);
+    public ResponseEntity<Competition> getCompetition(@PathVariable("competitionId") final String competitionId) {
+        final Optional<Competition> competition = competitionService.findCompetition(Long.valueOf(competitionId));
+        if (!competition.isPresent()) {
+            throw new NotFoundException();
+        }
         return new ResponseEntity<Competition>(competition.get(), null, HttpStatus.OK);
     }
 }

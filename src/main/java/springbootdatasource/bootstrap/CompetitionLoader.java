@@ -5,11 +5,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import springbootdatasource.model.Competition;
 import springbootdatasource.repositories.CompetitionRepository;
 
-@Data
+@RequiredArgsConstructor
 @Component
 @Profile("dev")
 public class CompetitionLoader implements ApplicationListener<ContextRefreshedEvent> {
@@ -22,8 +22,9 @@ public class CompetitionLoader implements ApplicationListener<ContextRefreshedEv
     }
 
     private void init() {
-        competitionRepository.save(new Competition("competition-name-1"));
-        competitionRepository.save(new Competition("competition-name-2"));
-        competitionRepository.save(new Competition("competition-name-3"));
+
+          competitionRepository.save(new Competition("competition-name-1"));
+//        competitionRepository.save(new Competition("competition-name-2"));
+//        competitionRepository.save(new Competition("competition-name-3"));
     }
 }

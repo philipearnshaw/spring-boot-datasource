@@ -7,7 +7,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data
 @Entity
 @Table(schema = "HANDBALL", name = "COMPETITION")
@@ -18,10 +20,7 @@ public class Competition {
     private Long competitionId;
 
     private String name;
-
-    public Competition() {
-    }
-
+    
     public Competition(String name) {
         this.name = name;
     }

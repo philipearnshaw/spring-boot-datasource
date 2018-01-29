@@ -6,11 +6,11 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import springbootdatasource.model.Competition;
 import springbootdatasource.repositories.CompetitionRepository;
 
-@Data
+@RequiredArgsConstructor
 @Service
 public class CompetitionServiceImpl implements CompetitionService {
 
@@ -22,7 +22,7 @@ public class CompetitionServiceImpl implements CompetitionService {
         return competitions;
     }
 
-    public Optional<Competition> getCompetition(final Long competitionId) {
+    public Optional<Competition> findCompetition(final Long competitionId) {
         return competitionRepository.findById(competitionId);
     }
 }
