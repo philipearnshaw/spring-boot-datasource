@@ -1,5 +1,7 @@
 package springbootdatasource.controllers;
 
+import static springbootdatasource.validators.EntityValidator.requireNonNull;
+
 import java.util.Optional;
 import java.util.Set;
 
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import springbootdatasource.exception.NotFoundException;
 import springbootdatasource.model.Competition;
 import springbootdatasource.services.CompetitionService;
 
@@ -29,10 +30,7 @@ public class CompetitionController {
 
     @GetMapping("/{competitionId}")
     public ResponseEntity<Competition> getCompetition(@PathVariable("competitionId") final String competitionId) {
-        final Optional<Competition> competition = competitionService.findCompetition(Long.valueOf(competitionId));
-        if (!competition.isPresent()) {
-            throw new NotFoundException();
-        }
+        final Optional<Competition> competition = requireNonNull(competitionService.findCompetition(Long.valueOf(competitionId)), competitionId);
         return new ResponseEntity<Competition>(competition.get(), null, HttpStatus.OK);
     }
 }
