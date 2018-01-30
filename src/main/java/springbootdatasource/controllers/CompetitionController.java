@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +31,7 @@ public class CompetitionController {
     @GetMapping
     public ResponseEntity<Set<Competition>> getAllCompetitions() {
         log.debug("/handball/competitions request");
-        return new ResponseEntity<Set<Competition>>(competitionService.findAllCompetitions(), null, HttpStatus.OK);
+        return new ResponseEntity<Set<Competition>>(competitionService.findAllCompetitions(), HttpStatus.OK);
     }
 
     @GetMapping("/{competitionId}")
@@ -37,6 +40,17 @@ public class CompetitionController {
         log.debug("/handball/competitions/" + competitionId +  " request");
         
         final Optional<Competition> competition = requireNonNull(competitionService.findCompetition(Long.valueOf(competitionId)), competitionId);
-        return new ResponseEntity<Competition>(competition.get(), null, HttpStatus.OK);
+        return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
+    }
+    
+    @PostMapping
+    public ResponseEntity<Competition> postCompetition(@RequestBody final Competition competition) {
+        return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.CREATED);
+    }
+    
+    @PutMapping("/{competitionId}")
+    public ResponseEntity<Competition> putCompetition(@PathVariable("competitionId") final String competitionId, @RequestBody Competition competition) {
+        competition.setCompetitionId(Long.valueOf(competitionId));
+        return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.OK);
     }
 }
