@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import springbootdatasource.model.Competition;
 import springbootdatasource.services.CompetitionService;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/handball/competitions")
@@ -25,11 +27,15 @@ public class CompetitionController {
 
     @GetMapping
     public ResponseEntity<Set<Competition>> getAllCompetitions() {
+        log.debug("/handball/competitions request");
         return new ResponseEntity<Set<Competition>>(competitionService.findAllCompetitions(), null, HttpStatus.OK);
     }
 
     @GetMapping("/{competitionId}")
     public ResponseEntity<Competition> getCompetition(@PathVariable("competitionId") final String competitionId) {
+        
+        log.debug("/handball/competitions/" + competitionId +  " request");
+        
         final Optional<Competition> competition = requireNonNull(competitionService.findCompetition(Long.valueOf(competitionId)), competitionId);
         return new ResponseEntity<Competition>(competition.get(), null, HttpStatus.OK);
     }
