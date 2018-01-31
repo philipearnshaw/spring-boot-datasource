@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import springbootdatasource.exception.BadRequestException;
 import springbootdatasource.model.Competition;
 import springbootdatasource.services.CompetitionService;
 
@@ -45,6 +46,9 @@ public class CompetitionController {
     
     @PostMapping
     public ResponseEntity<Competition> postCompetition(@RequestBody final Competition competition) {
+        if (competition.getCompetitionId() != null) {
+            throw new BadRequestException("Competition id should not be set for a POST request");
+        }
         return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.CREATED);
     }
     

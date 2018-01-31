@@ -62,7 +62,7 @@ public class CompetitionControllerTest {
     @Test
     public void testGetCompetition() throws Exception {
         
-        Optional<Competition> optionalCompetition = Optional.of(new Competition());
+        final Optional<Competition> optionalCompetition = Optional.of(new Competition());
         
         when(competitionService.findCompetition(Mockito.anyLong())).thenReturn(optionalCompetition);
  
@@ -96,8 +96,7 @@ public class CompetitionControllerTest {
     @Test
     public void testPostCompetition() throws Exception {
         
-        Competition competition = new Competition();
-        competition.setCompetitionId(1L);
+        final Competition competition = new Competition();
         competition.setName("competition-name");
         
         when(competitionService.saveCompetition(any(Competition.class))).thenReturn(new Competition());
@@ -111,6 +110,21 @@ public class CompetitionControllerTest {
         verify(competitionService, times(1)).saveCompetition(any(Competition.class));
     }
 
+    @Test
+    public void testPostCompetition_ShouldGiveBadRequest() throws Exception {
+        
+        final Competition competition = new Competition();
+        competition.setCompetitionId(1L);
+        competition.setName("competition-name");
+        
+        mockMvc.perform(post("/handball/competitions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(competition))
+            )
+            .andExpect(status().isBadRequest());
+        
+        verify(competitionService, never()).saveCompetition(any(Competition.class));
+    }
     
     /**
      * PutCompetition tests
@@ -118,8 +132,7 @@ public class CompetitionControllerTest {
     @Test
     public void testPutCompetition() throws Exception {
         
-        Competition competition = new Competition();
-        competition.setCompetitionId(1L);
+        final Competition competition = new Competition();
         competition.setName("competition-name");
         
         when(competitionService.saveCompetition(any(Competition.class))).thenReturn(new Competition());
@@ -136,16 +149,12 @@ public class CompetitionControllerTest {
     @Test
     public void testPutCompetition_ShouldGiveBadRequest() throws Exception {
         
-        Competition competition = new Competition();
-        competition.setCompetitionId(1L);
-        competition.setName("competition-name");
-        
-        when(competitionService.saveCompetition(any(Competition.class))).thenReturn(new Competition());
-        
         mockMvc.perform(put("/handball/competitions/a")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(competition))
+            .content(objectMapper.writeValueAsString(new Competition()))
             )
             .andExpect(status().isBadRequest());
+        
+        verify(competitionService, never()).saveCompetition(any(Competition.class));
     }
 }
