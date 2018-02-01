@@ -5,6 +5,8 @@ import static springbootdatasource.validators.EntityValidator.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +47,8 @@ public class CompetitionController {
     }
     
     @PostMapping
-    public ResponseEntity<Competition> postCompetition(@RequestBody final Competition competition) {
+    public ResponseEntity<Competition> postCompetition(@Valid @RequestBody final Competition competition) {
+
         if (competition.getCompetitionId() != null) {
             throw new BadRequestException("Competition id should not be set for a POST request");
         }
@@ -53,7 +56,7 @@ public class CompetitionController {
     }
     
     @PutMapping("/{competitionId}")
-    public ResponseEntity<Competition> putCompetition(@PathVariable("competitionId") final String competitionId, @RequestBody Competition competition) {
+    public ResponseEntity<Competition> putCompetition(@PathVariable("competitionId") final String competitionId, @Valid @RequestBody Competition competition) {
         competition.setCompetitionId(Long.valueOf(competitionId));
         return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.OK);
     }

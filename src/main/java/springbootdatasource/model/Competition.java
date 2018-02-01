@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class Competition {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long competitionId;
 
+    @NotNull
     private String name;
     
     public Competition(String name) {
