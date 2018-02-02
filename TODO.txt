@@ -1,0 +1,16 @@
+- Additional classes with date
+- Findbugs
+- PMD
+- Validation
+- Audit
+- Swagger or Spring REST Docs
+- Captor
+- Jackson views
+- OncePerRequest logging filter
+- DTO's using ModelMapper
+- Security & authentication
+- HATEOS
+- Actuator
+- Performance
+- Code coverage plus Pitest
+
