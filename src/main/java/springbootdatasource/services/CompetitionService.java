@@ -8,6 +8,7 @@ import springbootdatasource.model.Competition;
 public interface CompetitionService {
 
 	public Set<Competition> findAllCompetitions();
-	public Optional<Competition> findCompetition(final Long competitionId);
+	public Optional<Competition> findByCompetitionId(final Long competitionId);
 	public Competition saveCompetition(final Competition competition);
+    public void deleteById(final Long competitionId);
 }

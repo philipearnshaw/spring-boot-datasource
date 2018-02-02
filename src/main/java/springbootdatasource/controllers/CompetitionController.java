@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,11 +39,11 @@ public class CompetitionController {
     }
 
     @GetMapping("/{competitionId}")
-    public ResponseEntity<Competition> getCompetition(@PathVariable("competitionId") final String competitionId) {
+    public ResponseEntity<Competition> getCompetitionById(@PathVariable("competitionId") final String competitionId) {
         
         log.debug("/handball/competitions/" + competitionId +  " request");
         
-        final Optional<Competition> competition = requireNonNull(competitionService.findCompetition(Long.valueOf(competitionId)), competitionId);
+        final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
         return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
     }
     
@@ -56,8 +57,18 @@ public class CompetitionController {
     }
     
     @PutMapping("/{competitionId}")
-    public ResponseEntity<Competition> putCompetition(@PathVariable("competitionId") final String competitionId, @Valid @RequestBody Competition competition) {
+    public ResponseEntity<Competition> putCompetitionById(@PathVariable("competitionId") final String competitionId, @Valid @RequestBody Competition competition) {
         competition.setCompetitionId(Long.valueOf(competitionId));
         return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.OK);
+    }
+    
+    @DeleteMapping("/{competitionId}")
+    public ResponseEntity<Competition> deleteCompetitionById(@PathVariable String competitionId){
+
+        log.debug("Deleting id: " + competitionId);
+        
+        final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
+        competitionService.deleteById(Long.valueOf(competitionId));
+        return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
     }
 }

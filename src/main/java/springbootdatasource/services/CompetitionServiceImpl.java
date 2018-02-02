@@ -24,12 +24,17 @@ public class CompetitionServiceImpl implements CompetitionService {
     }
 
     @Override
-    public Optional<Competition> findCompetition(final Long competitionId) {
+    public Optional<Competition> findByCompetitionId(final Long competitionId) {
         return competitionRepository.findById(competitionId);
     }
 
     @Override
     public Competition saveCompetition(final Competition competition) {
         return competitionRepository.save(competition);
+    }
+    
+    @Override
+    public void deleteById(final Long competitionId) {
+        competitionRepository.deleteById(competitionId);
     }
 }
