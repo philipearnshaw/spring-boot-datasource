@@ -34,22 +34,17 @@ public class CompetitionController {
 
     @GetMapping
     public ResponseEntity<Set<Competition>> getAllCompetitions() {
-        log.debug("/handball/competitions request");
         return new ResponseEntity<Set<Competition>>(competitionService.findAllCompetitions(), HttpStatus.OK);
     }
 
     @GetMapping("/{competitionId}")
     public ResponseEntity<Competition> getCompetitionById(@PathVariable("competitionId") final String competitionId) {
-        
-        log.debug("/handball/competitions/" + competitionId +  " request");
-        
         final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
         return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
     }
     
     @PostMapping
     public ResponseEntity<Competition> postCompetition(@Valid @RequestBody final Competition competition) {
-
         if (competition.getCompetitionId() != null) {
             throw new BadRequestException("Competition id should not be set for a POST request");
         }
@@ -64,9 +59,6 @@ public class CompetitionController {
     
     @DeleteMapping("/{competitionId}")
     public ResponseEntity<Competition> deleteCompetitionById(@PathVariable String competitionId){
-
-        log.debug("Deleting id: " + competitionId);
-        
         final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
         competitionService.deleteById(Long.valueOf(competitionId));
         return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
