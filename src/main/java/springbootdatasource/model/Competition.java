@@ -5,10 +5,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.PositiveOrZero;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import springbootdatasource.model.profiles.CompetitionProfile;
 
 @NoArgsConstructor
 @Data
@@ -18,12 +22,23 @@ public class Competition {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(CompetitionProfile.SummaryView.class)
     private Long competitionId;
 
-    @NotNull
+    @NotEmpty
+    @JsonView(CompetitionProfile.SummaryView.class)
     private String name;
     
-    public Competition(String name) {
+    @NotEmpty
+    @JsonView(CompetitionProfile.DetailView.class)
+    private String owner;
+    
+    @PositiveOrZero
+    private Integer budget;  // Only shown when no view selected on controller endpoint.
+
+    public Competition(String name, String owner, Integer budget) {
         this.name = name;
+        this.owner = owner;
+        this.budget = budget;
     }
 }

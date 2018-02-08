@@ -22,8 +22,8 @@ public class CompetitionLoader implements ApplicationListener<ContextRefreshedEv
     }
 
     private void init() {
-        competitionRepository.save(new Competition("competition-name-1"));
-        competitionRepository.save(new Competition("competition-name-2"));
-        competitionRepository.save(new Competition("competition-name-3"));
+        competitionRepository.save(new Competition("competition-name-1", "owner-1", 100));
+        competitionRepository.save(new Competition("competition-name-2", "owner-2", 200)); 
+        competitionRepository.save(new Competition("competition-name-3", "owner-3", 300));
     }
 }

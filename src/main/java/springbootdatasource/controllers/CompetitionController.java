@@ -18,13 +18,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import springbootdatasource.exception.BadRequestException;
 import springbootdatasource.model.Competition;
+import springbootdatasource.model.profiles.CompetitionProfile;
 import springbootdatasource.services.CompetitionService;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/handball/competitions")
@@ -39,6 +40,20 @@ public class CompetitionController {
 
     @GetMapping("/{competitionId}")
     public ResponseEntity<Competition> getCompetitionById(@PathVariable("competitionId") final String competitionId) {
+        final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
+        return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
+    }
+    
+    @JsonView(CompetitionProfile.SummaryView.class)
+    @GetMapping("/summary/{competitionId}")
+    public ResponseEntity<Competition> getSummaryCompetitionById(@PathVariable("competitionId") final String competitionId) {
+        final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
+        return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
+    }
+    
+    @JsonView(CompetitionProfile.DetailView.class)
+    @GetMapping("/detail/{competitionId}")
+    public ResponseEntity<Competition> getPrivateCompetitionById(@PathVariable("competitionId") final String competitionId) {
         final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
         return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
     }
