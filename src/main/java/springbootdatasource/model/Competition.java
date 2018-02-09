@@ -6,7 +6,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PositiveOrZero;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -31,14 +30,14 @@ public class Competition {
     
     @NotEmpty
     @JsonView(CompetitionProfile.DetailView.class)
-    private String owner;
+    private String shortName;
     
-    @PositiveOrZero
-    private Integer budget;  // Only shown when no view selected on controller endpoint.
+    @NotEmpty
+    private String shortCode;  // Only shown when no view selected on controller endpoint.
 
-    public Competition(String name, String owner, Integer budget) {
+    public Competition(String name, String shortName, String shortCode) {
         this.name = name;
-        this.owner = owner;
-        this.budget = budget;
+        this.shortName = shortName;
+        this.shortCode = shortCode;
     }
 }

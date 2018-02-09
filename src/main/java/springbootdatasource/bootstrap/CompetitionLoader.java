@@ -11,7 +11,7 @@ import springbootdatasource.repositories.CompetitionRepository;
 
 @RequiredArgsConstructor
 @Component
-@Profile("dev")
+@Profile("default")
 public class CompetitionLoader implements ApplicationListener<ContextRefreshedEvent> {
 
     private final CompetitionRepository competitionRepository;
@@ -22,8 +22,8 @@ public class CompetitionLoader implements ApplicationListener<ContextRefreshedEv
     }
 
     private void init() {
-        competitionRepository.save(new Competition("competition-name-1", "owner-1", 100));
-        competitionRepository.save(new Competition("competition-name-2", "owner-2", 200)); 
-        competitionRepository.save(new Competition("competition-name-3", "owner-3", 300));
+        competitionRepository.save(new Competition("competition-name-1", "short-name-1", "100"));
+        competitionRepository.save(new Competition("competition-name-2", "short-name-2", "200")); 
+        competitionRepository.save(new Competition("competition-name-3", "short-name-3", "300"));
     }
 }
