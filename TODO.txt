@@ -5,7 +5,6 @@
 - Audit
 - Swagger or Spring REST Docs
 - Captor
-- Jackson views
 - OncePerRequest logging filter
 - DTO's using ModelMapper
 - Security & authentication

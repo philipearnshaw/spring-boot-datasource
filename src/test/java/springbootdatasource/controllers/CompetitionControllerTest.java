@@ -181,6 +181,8 @@ public class CompetitionControllerTest {
         final Competition competition = new Competition();
         competition.setCompetitionId(1L);
         competition.setName("competition-name");
+        competition.setOwner("competition-owner");
+        competition.setBudget(50);
         
         final Optional<Competition> optionalCompetition = Optional.of(competition);
         return optionalCompetition;
