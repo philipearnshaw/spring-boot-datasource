@@ -66,6 +66,7 @@ public class CompetitionController {
         return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.CREATED);
     }
     
+    @JsonView(CompetitionProfile.DetailView.class)
     @PutMapping("/{competitionId}")
     public ResponseEntity<Competition> putCompetitionById(@PathVariable("competitionId") final String competitionId, @Valid @RequestBody Competition competition) {
         competition.setCompetitionId(Long.valueOf(competitionId));

@@ -1,10 +1,17 @@
 package springbootdatasource.model;
 
+import java.util.Calendar;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -34,10 +41,29 @@ public class Competition {
     
     @NotEmpty
     private String shortCode;  // Only shown when no view selected on controller endpoint.
+    
+    @Column(name = "CR_DATE", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar createDate;
+    
+    @Column(name = "LAST_UPDATED", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar lastUpdated;
 
     public Competition(String name, String shortName, String shortCode) {
         this.name = name;
         this.shortName = shortName;
         this.shortCode = shortCode;
+    }
+    
+    @PrePersist
+    public void prePersist() {
+        createDate = Calendar.getInstance();
+        lastUpdated = Calendar.getInstance();
+    }
+    
+    @PreUpdate
+    public void preUpdate() {
+        lastUpdated = Calendar.getInstance();
     }
 }
