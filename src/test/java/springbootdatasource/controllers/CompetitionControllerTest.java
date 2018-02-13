@@ -29,6 +29,9 @@ import springbootdatasource.services.CompetitionService;
 
 public class CompetitionControllerTest {
 
+    private static final long KNOWN_COMPETITION_ID = 1L;
+    private static final long UNKNOWN_COMPETITION_ID = 99L;
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Optional<Competition> optionalCompetition;
     
@@ -65,8 +68,8 @@ public class CompetitionControllerTest {
         
         when(competitionService.findByCompetitionId(anyLong())).thenReturn(optionalCompetition);
  
-        mockMvc.perform(get("/handball/competitions/1")).andExpect(status().isOk());
-        verify(competitionService, times(1)).findByCompetitionId(anyLong());
+        mockMvc.perform(get("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)).andExpect(status().isOk());
+        verify(competitionService, times(1)).findByCompetitionId(KNOWN_COMPETITION_ID);
     }
     
     @Test
@@ -74,16 +77,16 @@ public class CompetitionControllerTest {
 
         when(competitionService.findByCompetitionId(anyLong())).thenReturn(Optional.empty());
         
-        mockMvc.perform(get("/handball/competitions/5"))
+        mockMvc.perform(get("/handball/competitions/{competitionId}", UNKNOWN_COMPETITION_ID))
             .andExpect(status().isNotFound());
         
-        verify(competitionService, times(1)).findByCompetitionId(anyLong());
+        verify(competitionService, times(1)).findByCompetitionId(UNKNOWN_COMPETITION_ID);
     }
     
     @Test
     public void testCompetitionById_ShouldThrowBadRequestException() throws Exception {
         
-        mockMvc.perform(get("/handball/competitions/f"))
+        mockMvc.perform(get("/handball/competitions/{competitionId}", "f"))
             .andExpect(status().isBadRequest());
         
         verify(competitionService, never()).findByCompetitionId(anyLong());
@@ -129,7 +132,7 @@ public class CompetitionControllerTest {
 
         when(competitionService.saveCompetition(optionalCompetition.get())).thenReturn(optionalCompetition.get());
         
-        mockMvc.perform(put("/handball/competitions/1")
+        mockMvc.perform(put("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(optionalCompetition.get()))
             )
@@ -141,7 +144,7 @@ public class CompetitionControllerTest {
     @Test
     public void testPutCompetitionById_ShouldGiveBadRequest() throws Exception {
         
-        mockMvc.perform(put("/handball/competitions/a")
+        mockMvc.perform(put("/handball/competitions/{competitionId}", "a")
             .contentType(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().isBadRequest());
@@ -155,19 +158,19 @@ public class CompetitionControllerTest {
     @Test
     public void testDeleteCompetitionById() throws Exception {
         
-        when(competitionService.findByCompetitionId(1L)).thenReturn(optionalCompetition);
+        when(competitionService.findByCompetitionId(KNOWN_COMPETITION_ID)).thenReturn(optionalCompetition);
         
-        mockMvc.perform(delete("/handball/competitions/1"))
+        mockMvc.perform(delete("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID))
             .andExpect(status().isOk());
         
-        verify(competitionService, times(1)).deleteById(anyLong());
+        verify(competitionService, times(1)).deleteById(KNOWN_COMPETITION_ID);
     }
 
     
     @Test
     public void testDeleteCompetitionById_ShouldGiveBadRequest() throws Exception {
         
-        mockMvc.perform(delete("/handball/competitions/a")
+        mockMvc.perform(delete("/handball/competitions/{competitionId}", "a")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         
@@ -179,7 +182,7 @@ public class CompetitionControllerTest {
      */
     private Optional<Competition> buildCompetitionAsOptional() {
         final Competition competition = new Competition();
-        competition.setCompetitionId(1L);
+        competition.setCompetitionId(KNOWN_COMPETITION_ID);
         competition.setName("competition-name");
         competition.setShortName("competition-short-name");
         competition.setShortCode("competition-short-code");
