@@ -57,7 +57,7 @@ public class CompetitionControllerTest {
     public void testGetAllCompetitions() throws Exception {
         mockMvc.perform(get("/handball/competitions")).andExpect(status().isOk());
         
-        verify(competitionService, times(1)).findAllCompetitions();
+        verify(competitionService).findAllCompetitions();
     }
 
     /**
@@ -69,7 +69,7 @@ public class CompetitionControllerTest {
         when(competitionService.findByCompetitionId(anyLong())).thenReturn(optionalCompetition);
  
         mockMvc.perform(get("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)).andExpect(status().isOk());
-        verify(competitionService, times(1)).findByCompetitionId(KNOWN_COMPETITION_ID);
+        verify(competitionService).findByCompetitionId(KNOWN_COMPETITION_ID);
     }
     
     @Test
@@ -80,7 +80,7 @@ public class CompetitionControllerTest {
         mockMvc.perform(get("/handball/competitions/{competitionId}", UNKNOWN_COMPETITION_ID))
             .andExpect(status().isNotFound());
         
-        verify(competitionService, times(1)).findByCompetitionId(UNKNOWN_COMPETITION_ID);
+        verify(competitionService).findByCompetitionId(UNKNOWN_COMPETITION_ID);
     }
     
     @Test
@@ -109,7 +109,7 @@ public class CompetitionControllerTest {
             )
             .andExpect(status().isCreated());
         
-        verify(competitionService, times(1)).saveCompetition(any(Competition.class));
+        verify(competitionService).saveCompetition(any(Competition.class));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class CompetitionControllerTest {
             )
             .andExpect(status().isOk());
         
-        verify(competitionService, times(1)).saveCompetition(any(Competition.class));
+        verify(competitionService).saveCompetition(any(Competition.class));
     }
     
     @Test
@@ -163,9 +163,8 @@ public class CompetitionControllerTest {
         mockMvc.perform(delete("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID))
             .andExpect(status().isOk());
         
-        verify(competitionService, times(1)).deleteById(KNOWN_COMPETITION_ID);
+        verify(competitionService).deleteById(KNOWN_COMPETITION_ID);
     }
-
     
     @Test
     public void testDeleteCompetitionById_ShouldGiveBadRequest() throws Exception {
