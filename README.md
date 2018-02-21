@@ -15,3 +15,7 @@ Jacoco is a code coverage reports generator for Java projects. JaCoCo runs as a 
  - `mvn jacoco:report` - see report index in `target/site/jacoco/index.html`.
  
  For more information on the design see `http://www.eclemma.org/jacoco/trunk/doc/implementation.html`.
+ 
+# Swagger
+  - GUI documentation can be viewed on `http://localhost:8080/swagger-ui.html`.
+  - API documentation can be viewed on `http://localhost:8080/v2/api-docs`.

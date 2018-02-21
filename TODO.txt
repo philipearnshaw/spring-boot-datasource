@@ -1,8 +1,5 @@
-- Expand unit tests
 - PMD
 - Validation
-- Audit
-- Swagger or Spring REST Docs
 - Captor
 - DTO's using ModelMapper
 - Security & authentication
