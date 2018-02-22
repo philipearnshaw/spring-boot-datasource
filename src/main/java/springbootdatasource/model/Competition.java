@@ -14,6 +14,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.Data;
@@ -22,6 +24,7 @@ import springbootdatasource.model.profiles.CompetitionProfile;
 
 @NoArgsConstructor
 @Data
+@JsonInclude(Include.NON_NULL)
 @Entity
 @Table(schema = "HANDBALL", name = "COMPETITION")
 public class Competition {
@@ -40,7 +43,8 @@ public class Competition {
     private String shortName;
     
     @NotEmpty
-    private String shortCode;  // Only shown when no view selected on controller endpoint.
+    @JsonView(CompetitionProfile.DetailView.class)
+    private String shortCode; 
     
     @Column(name = "CR_DATE", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

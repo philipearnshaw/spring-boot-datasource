@@ -1,5 +1,6 @@
 package springbootdatasource.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
@@ -9,44 +10,53 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import springbootdatasource.model.Competition;
 import springbootdatasource.services.CompetitionService;
 
+@RunWith(SpringRunner.class)
+@WebMvcTest(CompetitionController.class)
 public class CompetitionControllerTest {
 
     private static final long KNOWN_COMPETITION_ID = 1L;
     private static final long UNKNOWN_COMPETITION_ID = 99L;
     
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private Optional<Competition> optionalCompetition;
-    
-    @Mock
+    @MockBean                   // Tell Spring to inject the mock not the real bean.
     private CompetitionService competitionService;
     
-    private MockMvc mockMvc;
-    private CompetitionController competitionController;
+    @Autowired
+    private MockMvc mvc;
+    
+    private JacksonTester<Competition> competitionJson;
+    private JacksonTester<Set<Competition>> competitionsJson;
+    private MockHttpServletResponse response;
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
-        optionalCompetition = buildCompetitionAsOptional();
-        competitionController = new CompetitionController(competitionService);
-        mockMvc = MockMvcBuilders.standaloneSetup(competitionController).setControllerAdvice(new ControllerExceptionHandler()).build();
+        final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(Include.NON_NULL); // ignore null values
+        
+        JacksonTester.initFields(this, objectMapper);
     }
 
     /**
@@ -54,8 +64,18 @@ public class CompetitionControllerTest {
      */
     @Test
     public void testGetAllCompetitions() throws Exception {
-        mockMvc.perform(get("/handball/competitions")).andExpect(status().isOk());
+        final Set<Competition> competitions = new HashSet<>();
+        competitions.add(buildCompetition());
+        competitions.add(buildCompetition());
+        when(competitionService.findAllCompetitions()).thenReturn(competitions);
         
+        response = mvc.perform(
+                get("/handball/competitions")
+                .accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
+        
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(competitionsJson.write(competitions).getJson());
         verify(competitionService).findAllCompetitions();
     }
 
@@ -65,9 +85,15 @@ public class CompetitionControllerTest {
     @Test
     public void testCompetitionById() throws Exception {
         
-        when(competitionService.findByCompetitionId(anyLong())).thenReturn(optionalCompetition);
+        when(competitionService.findByCompetitionId(anyLong())).thenReturn(Optional.of(buildCompetition()));
  
-        mockMvc.perform(get("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)).andExpect(status().isOk());
+        response = mvc.perform(
+                get("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)
+                .accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
+       
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(competitionJson.write(buildCompetition()).getJson());
         verify(competitionService).findByCompetitionId(KNOWN_COMPETITION_ID);
     }
     
@@ -76,18 +102,24 @@ public class CompetitionControllerTest {
 
         when(competitionService.findByCompetitionId(anyLong())).thenReturn(Optional.empty());
         
-        mockMvc.perform(get("/handball/competitions/{competitionId}", UNKNOWN_COMPETITION_ID))
-            .andExpect(status().isNotFound());
+        response = mvc.perform(
+                get("/handball/competitions/{competitionId}", UNKNOWN_COMPETITION_ID)
+                .accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
         
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         verify(competitionService).findByCompetitionId(UNKNOWN_COMPETITION_ID);
     }
     
     @Test
     public void testCompetitionById_ShouldThrowBadRequestException() throws Exception {
         
-        mockMvc.perform(get("/handball/competitions/{competitionId}", "f"))
-            .andExpect(status().isBadRequest());
+        response = mvc.perform(
+                get("/handball/competitions/{competitionId}", "f")
+                .accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
         
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         verify(competitionService, never()).findByCompetitionId(anyLong());
     }
     
@@ -97,29 +129,34 @@ public class CompetitionControllerTest {
     @Test
     public void testPostCompetition() throws Exception {
         
-        final Competition competition = buildCompetitionAsOptional().get();
-        competition.setCompetitionId(null);
+        final Competition postCompetition = buildCompetition();
+        postCompetition.setCompetitionId(null);
         
-        when(competitionService.saveCompetition(competition)).thenReturn(new Competition());
+        when(competitionService.saveCompetition(any(Competition.class))).thenReturn(buildCompetition());
         
-        mockMvc.perform(post("/handball/competitions")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(competition))
-            )
-            .andExpect(status().isCreated());
+        response = mvc.perform(
+                post("/handball/competitions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(competitionJson.write(postCompetition).getJson()))
+            .andReturn().getResponse();
         
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response.getContentAsString()).isEqualTo(competitionJson.write(buildCompetition()).getJson());
         verify(competitionService).saveCompetition(any(Competition.class));
     }
 
     @Test
     public void testPostCompetition_ShouldGiveBadRequestAsIdSet() throws Exception {
         
-        mockMvc.perform(post("/handball/competitions")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(optionalCompetition.get()))
-            )
-            .andExpect(status().isBadRequest());
+        response = mvc.perform(
+                post("/handball/competitions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(competitionJson.write(buildCompetition()).getJson()))
+            .andReturn().getResponse();
         
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         verify(competitionService, never()).saveCompetition(any(Competition.class));
     }
     
@@ -128,26 +165,32 @@ public class CompetitionControllerTest {
      */
     @Test
     public void testPutCompetitionById() throws Exception {
+        Competition putViewCompetition = buildCompetition();
 
-        when(competitionService.saveCompetition(optionalCompetition.get())).thenReturn(optionalCompetition.get());
+        when(competitionService.saveCompetition(any(Competition.class))).thenReturn(buildCompetition());
         
-        mockMvc.perform(put("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(optionalCompetition.get()))
-            )
-            .andExpect(status().isOk());
+        response = mvc.perform(
+                put("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(competitionJson.write(buildCompetition()).getJson()))
+            .andReturn().getResponse();
         
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(competitionJson.write(putViewCompetition).getJson());
         verify(competitionService).saveCompetition(any(Competition.class));
     }
     
     @Test
     public void testPutCompetitionById_ShouldGiveBadRequest() throws Exception {
         
-        mockMvc.perform(put("/handball/competitions/{competitionId}", "a")
-            .contentType(MediaType.APPLICATION_JSON)
-            )
-            .andExpect(status().isBadRequest());
+        response = mvc.perform(
+                put("/handball/competitions/{competitionId}", "a")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
         
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         verify(competitionService, never()).saveCompetition(any(Competition.class));
     }
     
@@ -157,35 +200,42 @@ public class CompetitionControllerTest {
     @Test
     public void testDeleteCompetitionById() throws Exception {
         
-        when(competitionService.findByCompetitionId(KNOWN_COMPETITION_ID)).thenReturn(optionalCompetition);
+        when(competitionService.findByCompetitionId(KNOWN_COMPETITION_ID)).thenReturn(Optional.of(buildCompetition()));
         
-        mockMvc.perform(delete("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID))
-            .andExpect(status().isOk());
+        response = mvc.perform(
+                delete("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)
+                .accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
+        
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(competitionJson.write(buildCompetition()).getJson());
         
         verify(competitionService).deleteById(KNOWN_COMPETITION_ID);
     }
     
     @Test
     public void testDeleteCompetitionById_ShouldGiveBadRequest() throws Exception {
-        
-        mockMvc.perform(delete("/handball/competitions/{competitionId}", "a")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
-        
+
+        response = mvc.perform(
+                delete("/handball/competitions/{competitionId}", "a")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         verify(competitionService, never()).deleteById(anyLong());
     }
     
     /**
      * Helper methods.
      */
-    private Optional<Competition> buildCompetitionAsOptional() {
+    private Competition buildCompetition() {
         final Competition competition = new Competition();
         competition.setCompetitionId(KNOWN_COMPETITION_ID);
         competition.setName("competition-name");
         competition.setShortName("competition-short-name");
         competition.setShortCode("competition-short-code");
         
-        final Optional<Competition> optionalCompetition = Optional.of(competition);
-        return optionalCompetition;
+        return competition;
     }
 }

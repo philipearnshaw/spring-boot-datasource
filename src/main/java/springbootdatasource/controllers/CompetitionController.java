@@ -33,31 +33,20 @@ public class CompetitionController {
 
     private final CompetitionService competitionService;
 
+    @JsonView(CompetitionProfile.DetailView.class)
     @GetMapping
     public ResponseEntity<Set<Competition>> getAllCompetitions() {
         return new ResponseEntity<Set<Competition>>(competitionService.findAllCompetitions(), HttpStatus.OK);
     }
 
+    @JsonView(CompetitionProfile.DetailView.class)
     @GetMapping("/{competitionId}")
     public ResponseEntity<Competition> getCompetitionById(@PathVariable("competitionId") final String competitionId) {
         final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
         return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
     }
-    
-    @JsonView(CompetitionProfile.SummaryView.class)
-    @GetMapping("/summary/{competitionId}")
-    public ResponseEntity<Competition> getSummaryCompetitionById(@PathVariable("competitionId") final String competitionId) {
-        final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
-        return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
-    }
-    
+        
     @JsonView(CompetitionProfile.DetailView.class)
-    @GetMapping("/detail/{competitionId}")
-    public ResponseEntity<Competition> getPrivateCompetitionById(@PathVariable("competitionId") final String competitionId) {
-        final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
-        return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
-    }
-    
     @PostMapping
     public ResponseEntity<Competition> postCompetition(@Valid @RequestBody final Competition competition) {
         if (competition.getCompetitionId() != null) {
@@ -73,6 +62,7 @@ public class CompetitionController {
         return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.OK);
     }
     
+    @JsonView(CompetitionProfile.DetailView.class)
     @DeleteMapping("/{competitionId}")
     public ResponseEntity<Competition> deleteCompetitionById(@PathVariable String competitionId){
         final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
