@@ -182,7 +182,21 @@ public class CompetitionControllerTest {
     }
     
     @Test
-    public void testPutCompetitionById_ShouldGiveBadRequest() throws Exception {
+    public void testPutCompetitionById_ShouldGiveBadRequestForDifferentIdInBodyAndResource() throws Exception {
+        
+        response = mvc.perform(
+                put("/handball/competitions/{competitionId}", "5")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(competitionJson.write(buildCompetition()).getJson()))
+            .andReturn().getResponse();
+        
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        verify(competitionService, never()).saveCompetition(any(Competition.class));
+    }
+    
+    @Test
+    public void testPutCompetitionById_ShouldGiveBadRequestForAlphaId() throws Exception {
         
         response = mvc.perform(
                 put("/handball/competitions/{competitionId}", "a")

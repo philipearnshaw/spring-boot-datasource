@@ -49,15 +49,14 @@ public class CompetitionController {
     @JsonView(CompetitionProfile.DetailView.class)
     @PostMapping
     public ResponseEntity<Competition> postCompetition(@Valid @RequestBody final Competition competition) {
-        if (competition.getCompetitionId() != null) {
-            throw new BadRequestException("Competition id should not be set for a POST request");
-        }
+        requireNullCompetitionId(competition);
         return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.CREATED);
     }
     
     @JsonView(CompetitionProfile.DetailView.class)
     @PutMapping("/{competitionId}")
     public ResponseEntity<Competition> putCompetitionById(@PathVariable("competitionId") final String competitionId, @Valid @RequestBody Competition competition) {
+        requireBodyIdToBeNullOrDifferentFromResourceId(competitionId, competition);
         competition.setCompetitionId(Long.valueOf(competitionId));
         return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.OK);
     }
@@ -68,5 +67,20 @@ public class CompetitionController {
         final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
         competitionService.deleteById(Long.valueOf(competitionId));
         return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
+    }
+    
+    /**
+     * Helper methods
+     */
+    private void requireNullCompetitionId(final Competition competition) {
+        if (competition.getCompetitionId() != null) {
+            throw new BadRequestException("Competition id should not be set for a POST request");
+        }
+    }
+    
+    private void requireBodyIdToBeNullOrDifferentFromResourceId(final String competitionId, Competition competition) {
+        if (competition.getCompetitionId() != null && !competition.getCompetitionId().equals(Long.valueOf(competitionId))) {
+            throw new BadRequestException("Competition id is set in request body and does not match the resource id");
+        }
     }
 }
