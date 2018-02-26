@@ -1,8 +1,9 @@
 package springbootdatasource.services;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,8 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public Set<Competition> findAllCompetitions() {
-        final Set<Competition> competitions = new HashSet<>();
-        competitionRepository.findAll().forEach(competitions::add);
-        return competitions;
+        return StreamSupport.stream(competitionRepository.findAll().spliterator(), false)
+        .collect(Collectors.toSet());
     }
 
     @Override

@@ -59,4 +59,11 @@ public class Team implements Serializable {
     public void preUpdate() {
         lastUpdated = Calendar.getInstance();
     }
+
+    public Team(final String isInternational, final String name, final String nickname, final String shortName) {
+        this.isInternational = isInternational;
+        this.name = name;
+        this.nickname = nickname;
+        this.shortName = shortName;
+    }
 }
