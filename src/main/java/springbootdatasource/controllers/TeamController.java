@@ -1,7 +1,6 @@
 package springbootdatasource.controllers;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +23,6 @@ public class TeamController {
 
     @GetMapping
     ResponseEntity<Set<TeamDto>> getAllTeams() {
-        final Set<TeamDto> teamDtos = teamService.findAllTeams().stream()
-                .map(teamMapper::teamToTeamDto)
-                .collect(Collectors.toSet());
-        
-        return new ResponseEntity<Set<TeamDto>>(teamDtos, HttpStatus.OK);
+        return new ResponseEntity<Set<TeamDto>>(teamMapper.teamsToCarDtos(teamService.findAllTeams().stream()), HttpStatus.OK);
     }
 }
