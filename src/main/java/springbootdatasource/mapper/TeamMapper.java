@@ -1,7 +1,6 @@
 package springbootdatasource.mapper;
 
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -17,5 +16,5 @@ public interface TeamMapper {
     TeamDto teamToTeamDto(Team team);
     Team teamDtoToTeam(TeamDto teamDto);
     
-    Set<TeamDto> teamsToCarDtos(Stream<Team> teams);
+    Set<TeamDto> teamsToCarDtos(Set<Team> teams);
 }

@@ -21,5 +21,4 @@ public class TeamServiceImpl implements TeamService {
         return StreamSupport.stream(teamRepository.findAll().spliterator(), false)
         .collect(Collectors.toSet());
     }
-
 }
