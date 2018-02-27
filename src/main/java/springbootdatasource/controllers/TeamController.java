@@ -24,7 +24,7 @@ public class TeamController {
     @GetMapping
     ResponseEntity<Set<TeamDto>> getAllTeams() {
         return new ResponseEntity<Set<TeamDto>>(
-                teamMapper.teamsToCarDtos(teamService.findAllTeams()), HttpStatus.OK
+                teamMapper.teamsToTeamDtos(teamService.findAllTeams()), HttpStatus.OK
                 );
     }
 }

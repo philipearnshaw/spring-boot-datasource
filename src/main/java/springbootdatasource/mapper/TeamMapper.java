@@ -16,5 +16,5 @@ public interface TeamMapper {
     TeamDto teamToTeamDto(Team team);
     Team teamDtoToTeam(TeamDto teamDto);
     
-    Set<TeamDto> teamsToCarDtos(Set<Team> teams);
+    Set<TeamDto> teamsToTeamDtos(Set<Team> teams);
 }
