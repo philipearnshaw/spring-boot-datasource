@@ -3,9 +3,9 @@ package springbootdatasource.controllers;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -24,9 +24,8 @@ public class TeamController {
     private final TeamMapper teamMapper;
 
     @GetMapping
-    ResponseEntity<Set<TeamDto>> getAllTeams() {
-        return new ResponseEntity<Set<TeamDto>>(
-                teamMapper.teamsToTeamDtos(teamService.findAllTeams()), HttpStatus.OK
-                );
+    @ResponseStatus(HttpStatus.OK)
+    public Set<TeamDto> getAllTeams() {
+        return teamMapper.teamsToTeamDtos(teamService.findAllTeams());
     }
 }

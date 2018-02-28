@@ -8,7 +8,6 @@ import java.util.Set;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -37,38 +37,42 @@ public class CompetitionController {
 
     @JsonView(CompetitionProfile.DetailView.class)
     @GetMapping
-    public ResponseEntity<Set<Competition>> getAllCompetitions() {
-        return new ResponseEntity<Set<Competition>>(competitionService.findAllCompetitions(), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public Set<Competition> getAllCompetitions() {
+        return competitionService.findAllCompetitions();
     }
 
     @JsonView(CompetitionProfile.DetailView.class)
     @GetMapping("/{competitionId}")
-    public ResponseEntity<Competition> getCompetitionById(@PathVariable("competitionId") final String competitionId) {
-        final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
-        return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public Competition getCompetitionById(@PathVariable("competitionId") final String competitionId) {
+        return requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId).get();
     }
         
     @JsonView(CompetitionProfile.DetailView.class)
     @PostMapping
-    public ResponseEntity<Competition> postCompetition(@Valid @RequestBody final Competition competition) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Competition postCompetition(@Valid @RequestBody final Competition competition) {
         requireNullCompetitionId(competition);
-        return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.CREATED);
+        return competitionService.saveCompetition(competition);
     }
     
     @JsonView(CompetitionProfile.DetailView.class)
     @PutMapping("/{competitionId}")
-    public ResponseEntity<Competition> putCompetitionById(@PathVariable("competitionId") final String competitionId, @Valid @RequestBody Competition competition) {
-        requireBodyIdToBeNullOrDifferentFromResourceId(competitionId, competition);
+    @ResponseStatus(HttpStatus.OK)
+    public Competition putCompetitionById(@PathVariable("competitionId") final String competitionId, @Valid @RequestBody Competition competition) {
+        requireBodyIdToBeNullOrSameAsResourceId(competitionId, competition);
         competition.setCompetitionId(Long.valueOf(competitionId));
-        return new ResponseEntity<Competition>(competitionService.saveCompetition(competition), HttpStatus.OK);
+        return competitionService.saveCompetition(competition);
     }
     
     @JsonView(CompetitionProfile.DetailView.class)
     @DeleteMapping("/{competitionId}")
-    public ResponseEntity<Competition> deleteCompetitionById(@PathVariable String competitionId){
+    @ResponseStatus(HttpStatus.OK)
+    public Competition deleteCompetitionById(@PathVariable String competitionId){
         final Optional<Competition> competition = requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId);
         competitionService.deleteById(Long.valueOf(competitionId));
-        return new ResponseEntity<Competition>(competition.get(), HttpStatus.OK);
+        return competition.get();
     }
     
     /**
@@ -80,7 +84,7 @@ public class CompetitionController {
         }
     }
     
-    private void requireBodyIdToBeNullOrDifferentFromResourceId(final String competitionId, Competition competition) {
+    private void requireBodyIdToBeNullOrSameAsResourceId(final String competitionId, Competition competition) {
         if (competition.getCompetitionId() != null && !competition.getCompetitionId().equals(Long.valueOf(competitionId))) {
             throw new BadRequestException("Competition id is set in request body and does not match the resource id");
         }
