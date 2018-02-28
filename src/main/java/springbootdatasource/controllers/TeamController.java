@@ -15,8 +15,10 @@ import springbootdatasource.services.TeamService;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/handball/teams")
+@RequestMapping(TeamController.TEAM_ROOT_URI)
 public class TeamController {
+    
+    public static final String TEAM_ROOT_URI = "/handball/teams";
     
     private final TeamService teamService;
     private final TeamMapper teamMapper;

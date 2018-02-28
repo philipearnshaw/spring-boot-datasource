@@ -15,8 +15,10 @@ import springbootdatasource.services.MatchService;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/handball/matches")
+@RequestMapping(MatchController.MATCH_ROOT_URI)
 public class MatchController {
+    
+    public static final String MATCH_ROOT_URI = "/handball/matches";
     
     private final MatchService matchService;
     private final MatchMapper matchMapper;

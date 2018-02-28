@@ -70,7 +70,7 @@ public class CompetitionControllerTest {
         when(competitionService.findAllCompetitions()).thenReturn(competitions);
         
         response = mvc.perform(
-                get("/handball/competitions")
+                get(CompetitionController.COMPETITION_ROOT_URI)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
@@ -88,7 +88,7 @@ public class CompetitionControllerTest {
         when(competitionService.findByCompetitionId(anyLong())).thenReturn(Optional.of(buildCompetition()));
  
         response = mvc.perform(
-                get("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)
+                get(getCompetitionRootUriWithId(), KNOWN_COMPETITION_ID)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
        
@@ -103,7 +103,7 @@ public class CompetitionControllerTest {
         when(competitionService.findByCompetitionId(anyLong())).thenReturn(Optional.empty());
         
         response = mvc.perform(
-                get("/handball/competitions/{competitionId}", UNKNOWN_COMPETITION_ID)
+                get(getCompetitionRootUriWithId(), UNKNOWN_COMPETITION_ID)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
@@ -115,7 +115,7 @@ public class CompetitionControllerTest {
     public void testCompetitionById_ShouldThrowBadRequestException() throws Exception {
         
         response = mvc.perform(
-                get("/handball/competitions/{competitionId}", "f")
+                get(getCompetitionRootUriWithId(), "f")
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
@@ -135,7 +135,7 @@ public class CompetitionControllerTest {
         when(competitionService.saveCompetition(any(Competition.class))).thenReturn(buildCompetition());
         
         response = mvc.perform(
-                post("/handball/competitions")
+                post(CompetitionController.COMPETITION_ROOT_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(competitionJson.write(postCompetition).getJson()))
@@ -150,7 +150,7 @@ public class CompetitionControllerTest {
     public void testPostCompetition_ShouldGiveBadRequestAsIdSet() throws Exception {
         
         response = mvc.perform(
-                post("/handball/competitions")
+                post(CompetitionController.COMPETITION_ROOT_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(competitionJson.write(buildCompetition()).getJson()))
@@ -170,7 +170,7 @@ public class CompetitionControllerTest {
         when(competitionService.saveCompetition(any(Competition.class))).thenReturn(buildCompetition());
         
         response = mvc.perform(
-                put("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)
+                put(getCompetitionRootUriWithId(), KNOWN_COMPETITION_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(competitionJson.write(buildCompetition()).getJson()))
@@ -185,7 +185,7 @@ public class CompetitionControllerTest {
     public void testPutCompetitionById_ShouldGiveBadRequestForDifferentIdInBodyAndResource() throws Exception {
         
         response = mvc.perform(
-                put("/handball/competitions/{competitionId}", "5")
+                put(getCompetitionRootUriWithId(), "5")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(competitionJson.write(buildCompetition()).getJson()))
@@ -199,7 +199,7 @@ public class CompetitionControllerTest {
     public void testPutCompetitionById_ShouldGiveBadRequestForAlphaId() throws Exception {
         
         response = mvc.perform(
-                put("/handball/competitions/{competitionId}", "a")
+                put(getCompetitionRootUriWithId(), "a")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
@@ -217,7 +217,7 @@ public class CompetitionControllerTest {
         when(competitionService.findByCompetitionId(KNOWN_COMPETITION_ID)).thenReturn(Optional.of(buildCompetition()));
         
         response = mvc.perform(
-                delete("/handball/competitions/{competitionId}", KNOWN_COMPETITION_ID)
+                delete(getCompetitionRootUriWithId(), KNOWN_COMPETITION_ID)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
@@ -231,7 +231,7 @@ public class CompetitionControllerTest {
     public void testDeleteCompetitionById_ShouldGiveBadRequest() throws Exception {
 
         response = mvc.perform(
-                delete("/handball/competitions/{competitionId}", "a")
+                delete(getCompetitionRootUriWithId(), "a")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
@@ -251,5 +251,9 @@ public class CompetitionControllerTest {
         competition.setShortCode("competition-short-code");
         
         return competition;
+    }
+    
+    private String getCompetitionRootUriWithId() {
+        return CompetitionController.COMPETITION_ROOT_URI + "/{competitionId}";
     }
 }

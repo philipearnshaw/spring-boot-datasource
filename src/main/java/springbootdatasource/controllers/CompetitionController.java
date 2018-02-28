@@ -28,8 +28,10 @@ import springbootdatasource.services.CompetitionService;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/handball/competitions")
+@RequestMapping(CompetitionController.COMPETITION_ROOT_URI)
 public class CompetitionController {
+    
+    public static final String COMPETITION_ROOT_URI = "/handball/competitions";
 
     private final CompetitionService competitionService;
 
