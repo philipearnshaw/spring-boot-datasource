@@ -17,4 +17,5 @@ public interface MatchMapper {
     Match matchDtoToMatch(MatchDto matchDto);
     
     Set<MatchDto> matchesToMatchDtos(Set<Match> matches);
+    Set<Match> iterableMatchesToSetMatches(Iterable<Match> matches);
 }

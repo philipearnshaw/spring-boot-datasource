@@ -17,4 +17,5 @@ public interface TeamMapper {
     Team teamDtoToTeam(TeamDto teamDto);
     
     Set<TeamDto> teamsToTeamDtos(Set<Team> teams);
+    Set<Team> iterableTeamsToSetTeams(Iterable<Team> teams);
 }

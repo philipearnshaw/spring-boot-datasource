@@ -2,12 +2,11 @@ package springbootdatasource.services;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import springbootdatasource.mapper.CompetitionMapper;
 import springbootdatasource.model.Competition;
 import springbootdatasource.repositories.CompetitionRepository;
 
@@ -19,8 +18,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public Set<Competition> findAllCompetitions() {
-        return StreamSupport.stream(competitionRepository.findAll().spliterator(), false)
-        .collect(Collectors.toSet());
+        return CompetitionMapper.INSTANCE.iterableCompetitionsToSetCompetitions(competitionRepository.findAll());
     }
 
     @Override
