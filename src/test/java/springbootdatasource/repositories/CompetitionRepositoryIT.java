@@ -1,8 +1,6 @@
 package springbootdatasource.repositories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
@@ -32,16 +30,22 @@ public class CompetitionRepositoryIT {
 
     @Test
     public void testFindByName_ShouldNotReturnCompetition() {
+        
+        // when
         final Optional<Competition> optionalCompetition = competitionRepository.findByName("unknown-name");
         
-        assertFalse("Competition is present", optionalCompetition.isPresent());
+        // then
+        assertThat(optionalCompetition.isPresent()).isFalse();
     }
     
     @Test
     public void testFindByName_ShouldReturnCompetition() {
+        
+        // when
         final Optional<Competition> optionalCompetition = competitionRepository.findByName(COMPETITION_NAME);
         
-        assertTrue("Competition is not present", optionalCompetition.isPresent());
-        assertEquals("Competition should be called " + COMPETITION_NAME, COMPETITION_NAME, optionalCompetition.get().getName());
+        // then
+        assertThat(optionalCompetition.isPresent()).isTrue();
+        assertThat(optionalCompetition.get().getName()).isEqualTo(COMPETITION_NAME);
     }
 }

@@ -1,6 +1,6 @@
 package springbootdatasource.validators;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static springbootdatasource.validators.EntityValidator.requireNonNull;
 
 import java.util.Optional;
@@ -20,6 +20,7 @@ public class EntityValidatorTest {
     @Test(expected = NotFoundException.class)
     public void testRequireNonNull_ShouldThrowExceptionForNullOptional() {
         
+        // when
         final Optional<Competition> optional = null;
         requireNonNull(optional, "5");
     }
@@ -27,6 +28,7 @@ public class EntityValidatorTest {
     @Test(expected = NotFoundException.class)
     public void testRequireNonNull_ShouldThrowExceptionForEmptyOptional() {
         
+        // when
         final Optional<Competition> optional = Optional.empty();
         requireNonNull(optional, "5");
     }
@@ -34,9 +36,11 @@ public class EntityValidatorTest {
     @Test
     public void testRequireNonNull_ShouldReturnSameOptional() {
         
+        // when
         final Optional<Competition> expectedOptional = Optional.of(new Competition());
         final Optional<Competition> returnedOptional = requireNonNull(expectedOptional, "5");
         
-        assertTrue(expectedOptional == returnedOptional);
+        // then
+        assertThat(returnedOptional).isEqualTo(expectedOptional);
     }
 }

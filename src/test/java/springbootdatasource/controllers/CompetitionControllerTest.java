@@ -3,9 +3,10 @@ package springbootdatasource.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -64,19 +65,24 @@ public class CompetitionControllerTest {
      */
     @Test
     public void testGetAllCompetitions() throws Exception {
+        
+        // given
         final Set<Competition> competitions = new HashSet<>();
         competitions.add(buildCompetition());
         competitions.add(buildCompetition());
-        when(competitionService.findAllCompetitions()).thenReturn(competitions);
         
+        given(competitionService.findAllCompetitions()).willReturn(competitions);
+        
+        // when
         response = mvc.perform(
                 get(CompetitionController.COMPETITION_ROOT_URI)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(times(1)).findAllCompetitions();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(competitionsJson.write(competitions).getJson());
-        verify(competitionService).findAllCompetitions();
     }
 
     /**
@@ -85,42 +91,50 @@ public class CompetitionControllerTest {
     @Test
     public void testCompetitionById() throws Exception {
         
-        when(competitionService.findByCompetitionId(anyLong())).thenReturn(Optional.of(buildCompetition()));
+        // given
+        given(competitionService.findByCompetitionId(anyLong())).willReturn(Optional.of(buildCompetition()));
  
+        // when
         response = mvc.perform(
                 get(getCompetitionRootUriWithId(), KNOWN_COMPETITION_ID)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
        
+        // then
+        then(competitionService).should(times(1)).findByCompetitionId(KNOWN_COMPETITION_ID);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(competitionJson.write(buildCompetition()).getJson());
-        verify(competitionService).findByCompetitionId(KNOWN_COMPETITION_ID);
     }
     
     @Test
     public void testCompetitionById_ShouldThrowNotFoundException() throws Exception {
 
-        when(competitionService.findByCompetitionId(anyLong())).thenReturn(Optional.empty());
+        // given
+        given(competitionService.findByCompetitionId(anyLong())).willReturn(Optional.empty());
         
+        // when
         response = mvc.perform(
                 get(getCompetitionRootUriWithId(), UNKNOWN_COMPETITION_ID)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(times(1)).findByCompetitionId(UNKNOWN_COMPETITION_ID);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
-        verify(competitionService).findByCompetitionId(UNKNOWN_COMPETITION_ID);
     }
     
     @Test
     public void testCompetitionById_ShouldThrowBadRequestException() throws Exception {
         
+        // when
         response = mvc.perform(
                 get(getCompetitionRootUriWithId(), "f")
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(never()).findByCompetitionId(anyLong());
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        verify(competitionService, never()).findByCompetitionId(anyLong());
     }
     
     /**
@@ -129,11 +143,13 @@ public class CompetitionControllerTest {
     @Test
     public void testPostCompetition() throws Exception {
         
+        // given
         final Competition postCompetition = buildCompetition();
         postCompetition.setCompetitionId(null);
         
-        when(competitionService.saveCompetition(any(Competition.class))).thenReturn(buildCompetition());
+        given(competitionService.saveCompetition(any(Competition.class))).willReturn(buildCompetition());
         
+        // when
         response = mvc.perform(
                 post(CompetitionController.COMPETITION_ROOT_URI)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -141,14 +157,16 @@ public class CompetitionControllerTest {
                 .content(competitionJson.write(postCompetition).getJson()))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(times(1)).saveCompetition(any(Competition.class));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(response.getContentAsString()).isEqualTo(competitionJson.write(buildCompetition()).getJson());
-        verify(competitionService).saveCompetition(any(Competition.class));
     }
 
     @Test
     public void testPostCompetition_ShouldGiveBadRequestAsIdSet() throws Exception {
         
+        // when
         response = mvc.perform(
                 post(CompetitionController.COMPETITION_ROOT_URI)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -156,8 +174,9 @@ public class CompetitionControllerTest {
                 .content(competitionJson.write(buildCompetition()).getJson()))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(never()).saveCompetition(any(Competition.class));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        verify(competitionService, never()).saveCompetition(any(Competition.class));
     }
     
     /**
@@ -165,10 +184,12 @@ public class CompetitionControllerTest {
      */
     @Test
     public void testPutCompetitionById() throws Exception {
-        Competition putViewCompetition = buildCompetition();
-
-        when(competitionService.saveCompetition(any(Competition.class))).thenReturn(buildCompetition());
         
+        // given
+        Competition putViewCompetition = buildCompetition();
+        given(competitionService.saveCompetition(any(Competition.class))).willReturn(buildCompetition());
+        
+        // when
         response = mvc.perform(
                 put(getCompetitionRootUriWithId(), KNOWN_COMPETITION_ID)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -176,14 +197,16 @@ public class CompetitionControllerTest {
                 .content(competitionJson.write(buildCompetition()).getJson()))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(times(1)).saveCompetition(any(Competition.class));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(competitionJson.write(putViewCompetition).getJson());
-        verify(competitionService).saveCompetition(any(Competition.class));
     }
     
     @Test
     public void testPutCompetitionById_ShouldGiveBadRequestForDifferentIdInBodyAndResource() throws Exception {
         
+        // when
         response = mvc.perform(
                 put(getCompetitionRootUriWithId(), "5")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -191,21 +214,24 @@ public class CompetitionControllerTest {
                 .content(competitionJson.write(buildCompetition()).getJson()))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(never()).saveCompetition(any(Competition.class));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        verify(competitionService, never()).saveCompetition(any(Competition.class));
     }
     
     @Test
     public void testPutCompetitionById_ShouldGiveBadRequestForAlphaId() throws Exception {
         
+        // when
         response = mvc.perform(
                 put(getCompetitionRootUriWithId(), "a")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(never()).saveCompetition(any(Competition.class));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        verify(competitionService, never()).saveCompetition(any(Competition.class));
     }
     
     /**
@@ -214,30 +240,34 @@ public class CompetitionControllerTest {
     @Test
     public void testDeleteCompetitionById() throws Exception {
         
-        when(competitionService.findByCompetitionId(KNOWN_COMPETITION_ID)).thenReturn(Optional.of(buildCompetition()));
+        // given
+        given(competitionService.findByCompetitionId(KNOWN_COMPETITION_ID)).willReturn(Optional.of(buildCompetition()));
         
+        // when
         response = mvc.perform(
                 delete(getCompetitionRootUriWithId(), KNOWN_COMPETITION_ID)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
         
+        // then
+        then(competitionService).should(times(1)).deleteById(KNOWN_COMPETITION_ID);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(competitionJson.write(buildCompetition()).getJson());
-        
-        verify(competitionService).deleteById(KNOWN_COMPETITION_ID);
     }
     
     @Test
     public void testDeleteCompetitionById_ShouldGiveBadRequest() throws Exception {
 
+        // when
         response = mvc.perform(
                 delete(getCompetitionRootUriWithId(), "a")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
             .andReturn().getResponse();
 
+        // then
+        then(competitionService).should(never()).deleteById(anyLong());
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        verify(competitionService, never()).deleteById(anyLong());
     }
     
     /**
