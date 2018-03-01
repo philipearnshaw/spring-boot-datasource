@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import springbootdatasource.controllers.swagger.TeamControllerSwaggerDoc;
 import springbootdatasource.dto.TeamDto;
 import springbootdatasource.mapper.TeamMapper;
 import springbootdatasource.services.TeamService;
@@ -16,7 +17,7 @@ import springbootdatasource.services.TeamService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(TeamController.TEAM_ROOT_URI)
-public class TeamController {
+public class TeamController implements TeamControllerSwaggerDoc {
     
     public static final String TEAM_ROOT_URI = "/handball/teams";
     
@@ -25,6 +26,7 @@ public class TeamController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @Override
     public Set<TeamDto> getAllTeams() {
         return teamMapper.teamsToTeamDtos(teamService.findAllTeams());
     }

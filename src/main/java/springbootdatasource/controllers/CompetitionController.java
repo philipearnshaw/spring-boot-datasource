@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.RequiredArgsConstructor;
+import springbootdatasource.controllers.swagger.CompetitionControllerSwaggerDoc;
 import springbootdatasource.exception.BadRequestException;
 import springbootdatasource.model.Competition;
 import springbootdatasource.model.profiles.CompetitionProfile;
@@ -29,7 +30,7 @@ import springbootdatasource.services.CompetitionService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(CompetitionController.COMPETITION_ROOT_URI)
-public class CompetitionController {
+public class CompetitionController implements CompetitionControllerSwaggerDoc {
     
     public static final String COMPETITION_ROOT_URI = "/handball/competitions";
 
@@ -45,6 +46,7 @@ public class CompetitionController {
     @JsonView(CompetitionProfile.DetailView.class)
     @GetMapping("/{competitionId}")
     @ResponseStatus(HttpStatus.OK)
+    @Override
     public Competition getCompetitionById(@PathVariable("competitionId") final String competitionId) {
         return requireNonNull(competitionService.findByCompetitionId(Long.valueOf(competitionId)), competitionId).get();
     }
